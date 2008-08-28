@@ -1,3 +1,2 @@
-You may need to edit the cabal file to get the right libraries linked in. In
-particular, you may need to change "cblas" to "gslcblas". Or, if you are using
-ATLAS, you may need to add atlas at the end of the library list.
+If you get linker or unknown symbol errors when you try to load the library,
+you will need to edit the cabal file and give it the location of your CBLAS.
