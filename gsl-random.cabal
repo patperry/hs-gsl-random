@@ -19,9 +19,9 @@ tested-with:     GHC ==6.8.3
 extra-source-files:     README
 
 -- Below are the flags for specifying which CBLAS to link with.  If no flag
--- is specified, the default is to use ATLAS.  To use the "custom" flag, you
--- must edit the section at the end of the file with the name and location
--- of the CBLAS library you want to use.
+-- is specified, the default is to use the unoptimized CBLAS that comes with 
+-- the GSL.  To use the "custom" flag, you must edit the section at the end of
+-- the file with the name and location of the CBLAS library you want to use.
 
 flag atlas
     description:    Link with ATLAS.
@@ -55,19 +55,19 @@ library
     build-depends:      base
 
     if flag(atlas)
-        extra-libraries:    gsl cblas atlas
+        extra-libraries:    gsl cblas atlas m
       
     if flag(gsl)
-        extra-libraries:    gsl gslcblas
+        extra-libraries:    gsl gslcblas m
 
     if flag(mkl)
       if arch(x86_64)
-        extra-libraries:    gsl mkl_lapack mkl_intel_lp64 mkl_sequential mkl_core
+        extra-libraries:    gsl mkl_lapack mkl_intel_lp64 mkl_sequential mkl_core m
       else
-        extra-libraries:    gsl mkl_lapack mkl_intel mkl_sequential mkl_core
+        extra-libraries:    gsl mkl_lapack mkl_intel mkl_sequential mkl_core m
 
     if flag(veclib)
-        extra-libraries:    gsl cblas
+        extra-libraries:    gsl cblas m
 
     if flag(custom)
         -- CUSTOM CBLAS LIBS GO HERE
@@ -76,7 +76,7 @@ library
         -- PATH TO CUSTOM LIB DIR GOES HERE 
         extra-lib-dirs:     
     
-    -- fall back to ATLAS if no flag is specified
+    -- fall back to gsl cblas if no flag is specified
     if !flag(atlas) && !flag(gsl) && !flag(mkl) && !flag(veclib) && !flag(custom)
-        extra-libraries:    gsl cblas atlas
+        extra-libraries:    gsl gslcblas m
     

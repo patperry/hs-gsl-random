@@ -1,2 +1,5 @@
-If you get linker or unknown symbol errors when you try to load the library,
-you will need to edit the cabal file and give it the location of your CBLAS.
+If you care at all about performance, make sure you configure the library
+to use the best CBLAS installed on your system.  See the cabal file for
+details. To use atlas, run
+
+    runhaskell Setup.lhs configure -fatlas
