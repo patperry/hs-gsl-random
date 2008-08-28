@@ -28,4 +28,5 @@ library
     build-depends:      base
 
     extra-libraries:    gsl cblas
+    extra-lib-dirs:     /opt/local/lib
     
