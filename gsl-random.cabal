@@ -17,7 +17,7 @@ build-type:      Simple
 tested-with:     GHC == 6.10.1
 
 extra-source-files:     README configure.ac configure
-                        aclocal.m4 m4/ax_cblas.m4
+                        aclocal.m4 m4/ax_cblas.m4 m4/ax_gsl.m4
                         gsl-random.buildinfo.in
 
 extra-tmp-files:        config.log config.status autom4te.cache
