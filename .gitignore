@@ -1,0 +1,6 @@
+aclocal.m4
+configure
+config.log
+config.status
+dist/
+gsl-random.buildinfo
