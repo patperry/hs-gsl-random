@@ -41,15 +41,12 @@ module GSL.Random.Gen.Internal (
     ) where
        
 import Control.Monad         ( liftM )
-import Data.Maybe            ( fromJust ) 
 import Data.Word             ( Word8, Word64 )
-import Foreign.C.Types       ( CULong, CSize, CInt, CDouble )
-import Foreign.C.String      ( CString, withCAString, peekCAString )
+import Foreign.C.Types       ( CULong, CSize, CDouble )
+import Foreign.C.String      ( CString, peekCAString )
 import Foreign.ForeignPtr    ( ForeignPtr, newForeignPtr, withForeignPtr )
-import Foreign.Marshal.Array ( peekArray, pokeArray, advancePtr )
-import Foreign.Ptr           ( Ptr, FunPtr, castPtr, nullPtr )
-import Foreign.Storable      ( peek )
-import System.IO.Unsafe      ( unsafePerformIO )
+import Foreign.Marshal.Array ( peekArray, pokeArray )
+import Foreign.Ptr           ( Ptr, FunPtr )
 
 newtype RNG     = MkRNG (ForeignPtr ())
 newtype RNGType = MkRNGType (Ptr ())
@@ -211,35 +208,6 @@ foreign import ccall unsafe "gsl/gsl_rng.h"
 
 
 mt19937 :: RNGType
-mt19937 = 
-    unsafePerformIO $
-        withCAString "mt19937" $ \name ->
-            liftM fromJust $ getRngType name
-{-# NOINLINE mt19937 #-}
+mt19937 = MkRNGType gsl_rng_mt19937
 
-getRngType :: CString -> IO (Maybe RNGType)
-getRngType name =
-    go gsl_rng_types_setup
-    where
-        go :: Ptr (Ptr ()) -> IO (Maybe RNGType)
-        go types = do
-            t <- peek types
-            if t == nullPtr 
-              then
-                return Nothing
-                
-              else do
-                name' <- peek (castPtr t)
-                cmp   <- c_strcmp name name'
-                
-                if cmp == 0
-                  then return $ Just (MkRNGType t)
-                  else go $ types `advancePtr` 1
-                    
-
-
-foreign import ccall unsafe "string.h strcmp"
-    c_strcmp :: CString -> CString -> IO CInt
-
-foreign import ccall unsafe "gsl/gsl_randist.h"
-    gsl_rng_types_setup :: Ptr (Ptr ())
+foreign import ccall unsafe "gsl/gsl_rng.h &" gsl_rng_mt19937 :: Ptr ()
