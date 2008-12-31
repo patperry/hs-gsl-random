@@ -1,6 +1,6 @@
 name:            gsl-random
-version:         0.2.1
-homepage:        http://stat.stanford.edu/~patperry/code/gsl-random.git
+version:         0.2.2
+homepage:        http://github.com/patperry/gsl-random
 synopsis:        Bindings the the GSL random number generation facilities.
 description:
     Bindings to the GNU Scientific Library random number generators and random
@@ -13,7 +13,7 @@ copyright:       (c) 2008. Patrick Perry <patperry@stanford.edu>
 author:          Patrick Perry
 maintainer:      Patrick Perry <patperry@stanford.edu>
 cabal-version:   >= 1.2.0
-build-type:      Simple
+build-type:      Configure
 tested-with:     GHC == 6.10.1
 
 extra-source-files:     README configure.ac configure
