@@ -47,6 +47,8 @@ import Foreign.C.String      ( CString, peekCAString )
 import Foreign.ForeignPtr    ( ForeignPtr, newForeignPtr, withForeignPtr )
 import Foreign.Marshal.Array ( peekArray, pokeArray )
 import Foreign.Ptr           ( Ptr, FunPtr )
+import Foreign.Storable      ( peek )
+import System.IO.Unsafe      ( unsafePerformIO )
 
 newtype RNG     = MkRNG (ForeignPtr ())
 newtype RNGType = MkRNGType (Ptr ())
@@ -208,6 +210,7 @@ foreign import ccall unsafe "gsl/gsl_rng.h"
 
 
 mt19937 :: RNGType
-mt19937 = MkRNGType gsl_rng_mt19937
+mt19937 = (MkRNGType . unsafePerformIO . peek) p_gsl_rng_mt19937
 
-foreign import ccall unsafe "gsl/gsl_rng.h &" gsl_rng_mt19937 :: Ptr ()
+foreign import ccall unsafe "gsl/gsl_rng.h &gsl_rng_mt19937" 
+    p_gsl_rng_mt19937 :: Ptr (Ptr ())
