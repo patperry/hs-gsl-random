@@ -34,7 +34,6 @@ module GSL.Random.Dist (
     ugaussianQInv,
 
     getUGaussian,
-    getUGaussianZiggurat,
     getUGaussianRatioMethod,
     
     -- * The Flat (Uniform) Distribution
@@ -186,12 +185,6 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 getUGaussian :: RNG -> IO Double
 getUGaussian = getUGaussianHelp gsl_ran_ugaussian
 
--- | @getUGaussianZiggurat r@ gets a normal random variable with mean
--- @0@ and standard deviation @1@.  
--- This uses the Marsaglia-Tsang ziggurat algorithm.
-getUGaussianZiggurat :: RNG -> IO Double
-getUGaussianZiggurat = getUGaussianHelp gsl_ran_ugaussian_ziggurat
-
 -- | @getUGaussianRatioMethod r@ gets a normal random variable with mean
 -- @0@ and standard deviation @1@.  
 -- This uses the Kinderman-Monahan-Leva ratio method.
@@ -207,8 +200,6 @@ getUGaussianHelp ran_ugaussian (MkRNG fptr)  =
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_ugaussian :: Ptr () -> IO CDouble
-foreign import ccall unsafe "gsl/gsl_randist.h"
-    gsl_ran_ugaussian_ziggurat :: Ptr () -> IO CDouble
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_ugaussian_ratio_method :: Ptr () -> IO CDouble
     
