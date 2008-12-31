@@ -7,6 +7,9 @@
 -- Maintainer : Patrick Perry <patperry@stanford.edu>
 -- Stability  : experimental
 --
+-- Random number distributions. Functions for generating random variates and
+-- computing their probability distributions.
+--
 
 module GSL.Random.Dist (
     -- * The Gaussian Distribution
@@ -260,18 +263,29 @@ getFlat (MkRNG fptr) a b  =
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_flat :: Ptr () -> CDouble -> CDouble -> IO CDouble
 
-
+-- | @poissonPdf k mu@ evaluates the probability density @p(k)@ at @k@ for 
+-- a Poisson distribution with mean @mu@.
 poissonPdf :: Int -> Double -> Double
-poissonPdf = undefined
+poissonPdf k = liftDouble $ gsl_ran_poisson_pdf (fromIntegral k)
 
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_poisson_pdf :: CUInt -> CDouble -> CDouble
+
+-- | @poissonP k mu@ evaluates the cumulative distribution function @P(k)@ 
+-- at @k@ for a Poisson distribution with mean @mu@.
 poissonP :: Int -> Double -> Double
-poissonP = undefined
+poissonP k = liftDouble $ gsl_cdf_poisson_P (fromIntegral k)
 
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_poisson_P :: CUInt -> CDouble -> CDouble
+
+-- | @poissonQ k mu@ evaluates the cumulative distribution function @Q(k)@ 
+-- at @k@ for a Poisson distribution with mean @mu@.
 poissonQ :: Int -> Double -> Double
-poissonQ = undefined
+poissonQ k = liftDouble $ gsl_cdf_poisson_Q (fromIntegral k)
 
---poissonPInv :: Double -> Double -> Int
---poissonQInv :: Double -> Double -> Int
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_poisson_Q :: CUInt -> CDouble -> CDouble
 
     
 -- | @getPoisson r mu@ gets a poisson random variable with mean @mu@.
@@ -280,7 +294,7 @@ getPoisson (MkRNG fptr) mu =
     let mu' = realToFrac mu
     in withForeignPtr fptr $ \ptr -> do
         x <- gsl_ran_poisson ptr mu' 
-        return $ (fromInteger . toInteger) x
+        return $ fromIntegral x
                     
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_poisson :: Ptr () -> CDouble -> IO CUInt

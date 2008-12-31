@@ -6,6 +6,7 @@
 -- Maintainer : Patrick Perry <patperry@stanford.edu>
 -- Stability  : experimental
 --
+-- Random number generators.
 
 module GSL.Random.Gen (
     module GSL.Random.Gen.Internal
