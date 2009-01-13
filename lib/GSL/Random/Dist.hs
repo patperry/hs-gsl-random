@@ -46,6 +46,17 @@ module GSL.Random.Dist (
     
     getFlat,
 
+    -- * The Exponential Distribution
+
+    exponentialPdf,
+
+    exponentialP,
+    exponentialQ,
+    exponentialPInv,
+    exponentialQInv,
+    
+    getExponential,
+
     -- * The Levy alpha-Stable Distributions
     getLevy,
     getLevySkew,
@@ -60,6 +71,7 @@ module GSL.Random.Dist (
     
     ) where
 
+import Control.Monad
 import Foreign.C.Types      ( CUInt, CDouble )
 import Foreign.ForeignPtr   ( withForeignPtr )
 import Foreign.Ptr          ( Ptr )
@@ -206,7 +218,46 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_ugaussian :: Ptr () -> IO CDouble
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_ugaussian_ratio_method :: Ptr () -> IO CDouble
+
+-- | @getExponential r mu@ gets a random exponential with mean @mu@.
+getExponential :: RNG -> Double -> IO Double
+getExponential (MkRNG f) mu = withForeignPtr f $ \p ->
+    liftM realToFrac $ gsl_ran_exponential p (realToFrac mu)
     
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_exponential :: Ptr () -> CDouble -> IO CDouble
+
+-- | @exponentialPdf x mu@ computes the density at @x@ of an exponential
+-- with mean @mu@.
+exponentialPdf :: Double -> Double -> Double
+exponentialPdf = liftDouble2 gsl_ran_exponential_pdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h" 
+    gsl_ran_exponential_pdf :: CDouble -> CDouble -> CDouble
+
+exponentialP :: Double -> Double -> Double
+exponentialP = liftDouble2 gsl_cdf_exponential_P
+
+foreign import ccall unsafe "gsl/gsl_randist.h" 
+    gsl_cdf_exponential_P :: CDouble -> CDouble -> CDouble
+
+exponentialQ :: Double -> Double -> Double
+exponentialQ = liftDouble2 gsl_cdf_exponential_Q
+
+foreign import ccall unsafe "gsl/gsl_randist.h" 
+    gsl_cdf_exponential_Q :: CDouble -> CDouble -> CDouble
+
+exponentialPInv :: Double -> Double -> Double
+exponentialPInv = liftDouble2 gsl_cdf_exponential_Pinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_exponential_Pinv :: CDouble -> CDouble -> CDouble
+
+exponentialQInv :: Double -> Double -> Double
+exponentialQInv = liftDouble2 gsl_cdf_exponential_Qinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_exponential_Qinv :: CDouble -> CDouble -> CDouble
 
 -- | @flatPdf x a b@ computes the probability density @p(x)@ at @x@ for
 -- a uniform distribution from @a@ to @b@.

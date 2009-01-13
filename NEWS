@@ -1,3 +1,7 @@
+
+Changes in 0.3.1
+* Add exponential distribution.
+
 Changes in 0.3:
 
 * Add Levy alpha-Stable distributions.
