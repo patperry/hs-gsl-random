@@ -37,18 +37,15 @@ module GSL.Random.Gen.Internal (
 
     -- * Algorithms
     mt19937,
+    rngType,
     
     ) where
        
-import Control.Monad         ( liftM )
-import Data.Word             ( Word8, Word64 )
-import Foreign.C.Types       ( CULong, CSize, CDouble )
-import Foreign.C.String      ( CString, peekCAString )
-import Foreign.ForeignPtr    ( ForeignPtr, newForeignPtr, withForeignPtr )
-import Foreign.Marshal.Array ( peekArray, pokeArray )
-import Foreign.Ptr           ( Ptr, FunPtr )
-import Foreign.Storable      ( peek )
-import System.IO.Unsafe      ( unsafePerformIO )
+import Control.Monad
+import Data.Maybe ( fromJust )
+import Foreign
+import Foreign.C.String
+import Foreign.C.Types
 
 newtype RNG     = MkRNG (ForeignPtr ())
 newtype RNGType = MkRNGType (Ptr ())
@@ -208,9 +205,35 @@ foreign import ccall unsafe "gsl/gsl_rng.h"
 
 --------------------------- Algorithms --------------------------------------
 
-
 mt19937 :: RNGType
-mt19937 = (MkRNGType . unsafePerformIO . peek) p_gsl_rng_mt19937
+mt19937 = fromJust $ rngType "mt19937"
 
-foreign import ccall unsafe "gsl/gsl_rng.h &gsl_rng_mt19937" 
-    p_gsl_rng_mt19937 :: Ptr (Ptr ())
+rngType :: String -> Maybe RNGType
+rngType str = unsafePerformIO $
+    withCAString str $ \name ->
+        getRngType name
+
+getRngType :: CString -> IO (Maybe RNGType)
+getRngType name =
+    go gsl_rng_types_setup
+    where
+        go :: Ptr (Ptr ()) -> IO (Maybe RNGType)
+        go types = do
+            t <- peek types
+            if t == nullPtr 
+              then
+                return Nothing
+                
+              else do
+                name' <- peek (castPtr t)
+                cmp   <- c_strcmp name name'
+                
+                if cmp == 0
+                  then return $ Just (MkRNGType t)
+                  else go $ types `advancePtr` 1
+                    
+foreign import ccall unsafe "string.h strcmp"
+    c_strcmp :: CString -> CString -> IO CInt
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_rng_types_setup :: Ptr (Ptr ())

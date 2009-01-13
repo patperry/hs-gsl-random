@@ -1,0 +1,4 @@
+Changes in 0.3:
+
+* Add Levy alpha-Stable distributions.
+* Fix GHCi bus error on x86-64
