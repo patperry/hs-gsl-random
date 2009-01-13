@@ -45,6 +45,10 @@ module GSL.Random.Dist (
     flatQInv,
     
     getFlat,
+
+    -- * The Levy alpha-Stable Distributions
+    getLevy,
+    getLevySkew,
     
     -- * The Poisson Distribution
     poissonPdf,
@@ -253,6 +257,29 @@ getFlat (MkRNG fptr) a b  =
         
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_flat :: Ptr () -> CDouble -> CDouble -> IO CDouble
+
+-- | @getLevy r c alpha@ gets a variate from the Levy symmetric stable
+-- distribution with scale @c@ and exponent @alpha@.  The algorithm only
+-- works for @0 <= alpha <= 2@.
+getLevy :: RNG -> Double -> Double -> IO (Double)
+getLevy (MkRNG f) c alpha =
+    withForeignPtr f $ \p ->
+        realToFrac `fmap` gsl_ran_levy p (realToFrac c) (realToFrac alpha)
+        
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_levy :: Ptr () -> CDouble -> CDouble -> IO CDouble
+
+-- | @getLevySkew r c alpha beta@ gets a variate from the Levy skew stable
+-- distribution with scale @c@, exponent @alpha@, and skewness parameter
+-- @beta@.  The skewness parameter must lie in the range @[-1,1]@.  The
+-- algorithm only works for @0 <= alpha <= 2@.
+getLevySkew :: RNG -> Double -> Double -> Double -> IO (Double)
+getLevySkew (MkRNG f) c alpha beta =
+    withForeignPtr f $ \p ->
+        realToFrac `fmap` gsl_ran_levy_skew p (realToFrac c) (realToFrac alpha) (realToFrac beta)
+        
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_levy_skew :: Ptr () -> CDouble -> CDouble -> CDouble -> IO CDouble
 
 -- | @poissonPdf k mu@ evaluates the probability density @p(k)@ at @k@ for 
 -- a Poisson distribution with mean @mu@.
