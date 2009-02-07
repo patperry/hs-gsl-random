@@ -47,7 +47,6 @@ module GSL.Random.Dist (
     getFlat,
 
     -- * The Exponential Distribution
-
     exponentialPdf,
 
     exponentialP,
@@ -69,6 +68,15 @@ module GSL.Random.Dist (
 
     getPoisson,
     
+    -- * The Cauchy Distribution
+    getCauchy,
+
+    cauchyPdf,
+    cauchyP,
+    cauchyQ,
+    cauchyPInv,
+    cauchyQInv
+
     ) where
 
 import Control.Monad
@@ -370,7 +378,49 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 
 
 
-    
+-- | @cauchyPdf x a@ evaluates the probability density @p(x)@ at @x@
+-- for a Cauchy distribution with scale parameter @a@.  The density
+-- is given by @p(x) dx = { 1 \over a\pi (1 + (x/a^2)) } dx@.
+cauchyPdf :: Double -> Double -> Double
+cauchyPdf = liftDouble2 gsl_ran_cauchy_pdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_cauchy_pdf :: CDouble -> CDouble -> CDouble
+
+-- | @getCauchy r a@ gets a random cauchy with scale @a@.
+getCauchy :: RNG -> Double -> IO Double
+getCauchy (MkRNG f) a = withForeignPtr f $ \p ->
+    liftM realToFrac $ gsl_ran_cauchy p (realToFrac a)
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_cauchy :: Ptr () -> CDouble -> IO CDouble
+
+cauchyP :: Double -> Double -> Double
+cauchyP = liftDouble2 gsl_cdf_cauchy_P
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_cauchy_P :: CDouble -> CDouble -> CDouble
+
+cauchyQ :: Double -> Double -> Double
+cauchyQ = liftDouble2 gsl_cdf_cauchy_Q
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_cauchy_Q :: CDouble -> CDouble -> CDouble
+
+cauchyPInv :: Double -> Double -> Double
+cauchyPInv = liftDouble2 gsl_cdf_cauchy_Pinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_cauchy_Pinv :: CDouble -> CDouble -> CDouble
+
+cauchyQInv :: Double -> Double -> Double
+cauchyQInv = liftDouble2 gsl_cdf_cauchy_Qinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_cauchy_Qinv :: CDouble -> CDouble -> CDouble
+
+
+
 liftDouble :: (CDouble -> CDouble) 
            -> Double -> Double
 liftDouble f x =
