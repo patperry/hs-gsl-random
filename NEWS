@@ -1,3 +1,6 @@
+Changes in 0.4
+* Tracy Wadleigh added support for quasi-random number sequences
+
 Changes in 0.3.2
 * Shawn Garbett added the Cauchy distribution.
 

@@ -1,16 +1,18 @@
 name:            gsl-random
-version:         0.3.2
+version:         0.4
 homepage:        http://github.com/patperry/gsl-random
 synopsis:        Bindings the the GSL random number generation facilities.
 description:
-    Bindings to the GNU Scientific Library random number generators and random
-    distributions.
+    Bindings to the GNU Scientific Library random and quasi-random number
+    generators and random distributions.
     .
 category:        Math
 license:         BSD3
 license-file:    LICENSE
 copyright:       (c) 2008. Patrick Perry <patperry@stanford.edu>
+                 (c) 2009. Tracy Wadleigh
 author:          Patrick Perry
+                 Tracy Wadleigh
 maintainer:      Patrick Perry <patperry@stanford.edu>
 cabal-version:   >= 1.2.0
 build-type:      Configure
@@ -27,8 +29,14 @@ library
     hs-source-dirs:     lib
     exposed-modules:    GSL.Random.Gen
                         GSL.Random.Dist
+                        GSL.Random.Quasi
     other-modules:      GSL.Random.Gen.Internal
+                        GSL.Random.Quasi.Internal
+    c-sources:          cbits/qrng_extras.c
 
     ghc-options:        -Wall
+    if !os(darwin)
+        cc-options:         -fPIC
     extensions:         ForeignFunctionInterface
     build-depends:      base
+

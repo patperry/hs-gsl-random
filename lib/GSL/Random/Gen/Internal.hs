@@ -167,7 +167,7 @@ getState rng@(MkRNG fptr) = do
     withForeignPtr fptr $ \ptr ->
         peekArray n (gsl_rng_state ptr)
         
-foreign import ccall unsafe "gsl/gsl_randist.h"
+foreign import ccall unsafe "gsl/gsl_rng.h"
     gsl_rng_state :: Ptr () -> Ptr Word8
 
 -- | Set the generator state.  The input array should have size equal
