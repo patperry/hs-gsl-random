@@ -29,4 +29,3 @@ const gsl_qrng_type* gsl_qrng_get_reversehalton()
 {
   return gsl_qrng_reversehalton;
 }
-

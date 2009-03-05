@@ -36,7 +36,6 @@ library
 
     ghc-options:        -Wall
     if !os(darwin)
-        cc-options:         -fPIC
+        cc-options:     -fPIC
     extensions:         ForeignFunctionInterface
     build-depends:      base
-
