@@ -15,7 +15,7 @@ module GSL.Random.Quasi.Internal (
 
     -- * Initializing
     newQRNG,
-    reinitialize,
+    resetQRNG,
 
     -- * Sampling
     getSample,
@@ -67,8 +67,8 @@ foreign import ccall unsafe "gsl/gsl_qrng.h &gsl_qrng_free"
     p_gsl_qrng_free :: FunPtr (Ptr QRNG -> IO ())
 
 -- | Reset the generator to the beginning of its sequence.
-reinitialize :: QRNG -> IO ()
-reinitialize (MkQRNG fptr) = withForeignPtr fptr $ gsl_qrng_init
+resetQRNG :: QRNG -> IO ()
+resetQRNG (MkQRNG fptr) = withForeignPtr fptr $ gsl_qrng_init
 
 foreign import ccall unsafe "gsl/gsl_qrng.h"
     gsl_qrng_init :: Ptr QRNG -> IO ()
