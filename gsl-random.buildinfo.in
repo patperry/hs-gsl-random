@@ -1,3 +1,0 @@
-
-buildable: @BUILD_PACKAGE_BOOL@
-ld-options: @GSL_LIBS@ @CBLAS_LIBS@ @LIBS@

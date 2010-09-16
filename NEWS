@@ -1,13 +1,14 @@
 Changes in 0.4
+* Switch to native (Cabal-based) configure
 * Tracy Wadleigh added support for quasi-random number sequences
 
 Changes in 0.3.2
-* Shawn Garbett added the Cauchy distribution.
+* Shawn Garbett added the Cauchy distribution
 
 Changes in 0.3.1
-* Add exponential distribution.
+* Add exponential distribution
 
 Changes in 0.3:
 
-* Add Levy alpha-Stable distributions.
+* Add Levy alpha-Stable distributions
 * Fix GHCi bus error on x86-64

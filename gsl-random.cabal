@@ -9,21 +9,16 @@ description:
 category:        Math
 license:         BSD3
 license-file:    LICENSE
-copyright:       (c) 2008. Patrick Perry <patperry@stanford.edu>
-                 (c) 2009. Tracy Wadleigh
+copyright:       (c) 2010. Patrick Perry <patperry@gmail.com>
+                 (c) 2010. Tracy Wadleigh
 author:          Patrick Perry
                  Tracy Wadleigh
-maintainer:      Patrick Perry <patperry@stanford.edu>
-cabal-version:   >= 1.2.0
-build-type:      Configure
-tested-with:     GHC == 6.10.1
+maintainer:      Patrick Perry <patperry@gmail.com>
+cabal-version:   >= 1.4.0
+build-type:      Custom
+tested-with:     GHC == 6.12.3
 
-extra-source-files:     README configure.ac configure
-                        aclocal.m4 m4/ax_cblas.m4 m4/ax_gsl.m4
-                        gsl-random.buildinfo.in
-
-extra-tmp-files:        config.log config.status autom4te.cache
-                        gsl-random.buildinfo
+extra-source-files:     NEWS
                         
 library
     hs-source-dirs:     lib
@@ -38,4 +33,4 @@ library
     if !os(darwin)
         cc-options:     -fPIC
     extensions:         ForeignFunctionInterface
-    build-depends:      base
+    build-depends:      base >= 4 && < 5
