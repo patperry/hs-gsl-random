@@ -9,9 +9,9 @@ description:
 category:        Math
 license:         BSD3
 license-file:    LICENSE
-copyright:       (c) 2010. Patrick Perry <patperry@gmail.com>
-                 (c) 2010. Tracy Wadleigh
-author:          Patrick Perry
+copyright:       Patrick Perry,
+                 Tracy Wadleigh
+author:          Patrick Perry,
                  Tracy Wadleigh
 maintainer:      Patrick Perry <patperry@gmail.com>
 cabal-version:   >= 1.4.0
