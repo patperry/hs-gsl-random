@@ -1,3 +1,7 @@
+Changes in 0.4.1
+* Require cabal >= 1.8
+* Fix framework detection bug in configure script on Mac OS
+
 Changes in 0.4
 * Switch to native (Cabal-based) configure
 * Tracy Wadleigh added support for quasi-random number sequences
