@@ -8,10 +8,8 @@
 > import Distribution.Simple.Program
 > import Distribution.Verbosity
 > 
-> import Data.Char (isSpace)
 > import Data.List (findIndices)
 > 
-> import Control.Monad
 > 
 > main = defaultMainWithHooks simpleUserHooks {
 >   hookedPrograms = [gslconfigProgram],
@@ -43,7 +41,7 @@
 >   return emptyBuildInfo {
 >       frameworks    =  [ libs !! (i+1)
 >                        | i <- findIndices (== "-framework") libs
->                        , i < length libs ]
+>                        , i + 1 < length libs ]
 >     , extraLibs     = flag "-l" libs
 >     , extraLibDirs  = flag "-L" libs
 >     , includeDirs   = flag "-I" cflags
