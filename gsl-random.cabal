@@ -1,6 +1,6 @@
 name:            gsl-random
 version:         0.4.1
-homepage:        http://github.com/patperry/gsl-random
+homepage:        http://github.com/patperry/hs-gsl-random
 synopsis:        Bindings the the GSL random number generation facilities.
 description:
     Bindings to the GNU Scientific Library random and quasi-random number
