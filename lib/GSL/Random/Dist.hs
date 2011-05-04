@@ -454,7 +454,7 @@ betaPdf = liftDouble3 gsl_ran_beta_pdf
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_beta_pdf :: CDouble -> CDouble -> CDouble -> CDouble
 
--- | @getBeta r a b@ gets a random beta with parameters @a@ ad @b@.
+-- | @getBeta r a b@ gets a random beta with parameters @a@ and @b@.
 getBeta :: RNG -> Double -> Double -> IO Double
 getBeta = liftRan2 gsl_ran_beta
 
