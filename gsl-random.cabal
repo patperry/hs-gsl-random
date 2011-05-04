@@ -1,5 +1,5 @@
 name:            gsl-random
-version:         0.4.1
+version:         0.4.2
 homepage:        http://github.com/patperry/hs-gsl-random
 synopsis:        Bindings the the GSL random number generation facilities.
 description:
@@ -19,7 +19,7 @@ build-type:      Custom
 tested-with:     GHC == 6.12.3
 
 extra-source-files:     NEWS
-                        
+
 library
     hs-source-dirs:     lib
     exposed-modules:    GSL.Random.Gen
@@ -33,4 +33,5 @@ library
     if !os(darwin)
         cc-options:     -fPIC
     extensions:         ForeignFunctionInterface
-    build-depends:      base >= 4 && < 5
+    build-depends:      base   >= 4       && < 5
+                      , vector >= 0.7.0.1 && < 0.8

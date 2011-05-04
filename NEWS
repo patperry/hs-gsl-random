@@ -1,3 +1,8 @@
+Changes in 0.4.2
+* Depend on the vector package.
+* Add many distributions: beta, logistic, Pareto, Weibull, gamma
+  and Dirichlet distributions are now available.
+
 Changes in 0.4.1
 * Require cabal >= 1.8
 * Fix framework detection bug in configure script on Mac OS
@@ -12,7 +17,6 @@ Changes in 0.3.2
 Changes in 0.3.1
 * Add exponential distribution
 
-Changes in 0.3:
-
+Changes in 0.3
 * Add Levy alpha-Stable distributions
 * Fix GHCi bus error on x86-64
