@@ -113,6 +113,16 @@ module GSL.Random.Dist (
     weibullPInv,
     weibullQInv,
 
+    -- * The Gamma Distribution
+    getGamma,
+    getGammaKnuth,
+
+    gammaPdf,
+    gammaP,
+    gammaQ,
+    gammaPInv,
+    gammaQInv,
+
     ) where
 
 import Control.Applicative  ( (<$>) )
@@ -622,6 +632,59 @@ weibullQInv = liftDouble3 gsl_cdf_weibull_Qinv
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_weibull_Qinv :: CDouble -> CDouble -> CDouble -> CDouble
+
+
+
+
+-- | @gammaPdf x a b@ evaluates the probability density @p(x)@ at @x@
+-- for a gamma distribution with parameters @a@ and @b@.  The density
+-- is given by @p(x) dx = p(x) dx = {1 \over \Gamma(a) b^a} x^{a-1} e^{-x/b} dx@
+-- for @x > 0@.
+gammaPdf :: Double -> Double -> Double -> Double
+gammaPdf = liftDouble3 gsl_ran_gamma_pdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_gamma_pdf :: CDouble -> CDouble -> CDouble -> CDouble
+
+-- | @getGamma r a b@ gets a random gamma with parameters @a@ and @b@.
+--   Uses the Marsagli-Tsang fast gamma method.
+getGamma :: RNG -> Double -> Double -> IO Double
+getGamma = liftRan2 gsl_ran_gamma
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_gamma :: Ptr () -> CDouble -> CDouble -> IO CDouble
+
+-- | @getGammaKnuth r a b@ gets a random gamma with parameters @a@ and @b@.
+--   Uses the algorithms from Knuth (vol 2).
+getGammaKnuth :: RNG -> Double -> Double -> IO Double
+getGammaKnuth = liftRan2 gsl_ran_gamma_knuth
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_gamma_knuth :: Ptr () -> CDouble -> CDouble -> IO CDouble
+
+gammaP :: Double -> Double -> Double -> Double
+gammaP = liftDouble3 gsl_cdf_gamma_P
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_gamma_P :: CDouble -> CDouble -> CDouble -> CDouble
+
+gammaQ :: Double -> Double -> Double -> Double
+gammaQ = liftDouble3 gsl_cdf_gamma_Q
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_gamma_Q :: CDouble -> CDouble -> CDouble -> CDouble
+
+gammaPInv :: Double -> Double -> Double -> Double
+gammaPInv = liftDouble3 gsl_cdf_gamma_Pinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_gamma_Pinv :: CDouble -> CDouble -> CDouble -> CDouble
+
+gammaQInv :: Double -> Double -> Double -> Double
+gammaQInv = liftDouble3 gsl_cdf_gamma_Qinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_gamma_Qinv :: CDouble -> CDouble -> CDouble -> CDouble
 
 
 
