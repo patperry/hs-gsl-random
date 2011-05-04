@@ -35,7 +35,7 @@ module GSL.Random.Dist (
 
     getUGaussian,
     getUGaussianRatioMethod,
-    
+
     -- * The Flat (Uniform) Distribution
     flatPdf,
 
@@ -43,7 +43,7 @@ module GSL.Random.Dist (
     flatQ,
     flatPInv,
     flatQInv,
-    
+
     getFlat,
 
     -- * The Exponential Distribution
@@ -53,13 +53,13 @@ module GSL.Random.Dist (
     exponentialQ,
     exponentialPInv,
     exponentialQInv,
-    
+
     getExponential,
 
     -- * The Levy alpha-Stable Distributions
     getLevy,
     getLevySkew,
-    
+
     -- * The Poisson Distribution
     poissonPdf,
 
@@ -67,7 +67,7 @@ module GSL.Random.Dist (
     poissonQ,
 
     getPoisson,
-    
+
     -- * The Cauchy Distribution
     getCauchy,
 
@@ -79,14 +79,14 @@ module GSL.Random.Dist (
 
     ) where
 
-import Control.Monad
+import Control.Applicative  ( (<$>) )
 import Foreign.C.Types      ( CUInt, CDouble )
 import Foreign.ForeignPtr   ( withForeignPtr )
 import Foreign.Ptr          ( Ptr )
 
 import GSL.Random.Gen.Internal ( RNG(..) )
 
--- | @gaussianPdf x sigma@ computes the probabililty density p(x) for 
+-- | @gaussianPdf x sigma@ computes the probabililty density p(x) for
 -- a Gaussian distribution with mean @0@ and standard deviation @sigma@.
 gaussianPdf :: Double -> Double -> Double
 gaussianPdf = liftDouble2 gsl_ran_gaussian_pdf
@@ -94,7 +94,7 @@ gaussianPdf = liftDouble2 gsl_ran_gaussian_pdf
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_gaussian_pdf :: CDouble -> CDouble -> CDouble
 
--- | @gaussianP x sigma@ computes the cumulative distribution function P(x) for 
+-- | @gaussianP x sigma@ computes the cumulative distribution function P(x) for
 -- a Gaussian distribution with mean @0@ and standard deviation @sigma@.
 gaussianP :: Double -> Double -> Double
 gaussianP = liftDouble2 gsl_cdf_gaussian_P
@@ -102,7 +102,7 @@ gaussianP = liftDouble2 gsl_cdf_gaussian_P
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_gaussian_P :: CDouble -> CDouble -> CDouble
 
--- | @gaussianQ x sigma@ computes the cumulative distribution function Q(x) for 
+-- | @gaussianQ x sigma@ computes the cumulative distribution function Q(x) for
 -- a Gaussian distribution with mean @0@ and standard deviation @sigma@.
 gaussianQ :: Double -> Double -> Double
 gaussianQ = liftDouble2 gsl_cdf_gaussian_Q
@@ -110,7 +110,7 @@ gaussianQ = liftDouble2 gsl_cdf_gaussian_Q
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_gaussian_Q :: CDouble -> CDouble -> CDouble
 
--- | @gaussianPInv p sigma@ computes the inverse of the cumulative distribution 
+-- | @gaussianPInv p sigma@ computes the inverse of the cumulative distribution
 -- function of a Gaussian distribution with mean @0@ and standard deviation
 -- @sigma@. It returns @x@ such that @P(x) = p@.
 gaussianPInv :: Double -> Double -> Double
@@ -119,7 +119,7 @@ gaussianPInv = liftDouble2 gsl_cdf_gaussian_Pinv
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_gaussian_Pinv :: CDouble -> CDouble -> CDouble
 
--- | @gaussianPInv q sigma@ computes the inverse of the cumulative distribution 
+-- | @gaussianPInv q sigma@ computes the inverse of the cumulative distribution
 -- function of a Gaussian distribution with mean @0@ and standard deviation
 -- @sigma@. It returns @x@ such that @Q(x) = q@.
 gaussianQInv :: Double -> Double -> Double
@@ -129,39 +129,33 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_gaussian_Qinv :: CDouble -> CDouble -> CDouble
 
 -- | @getGaussian r sigma@ gets a normal random variable with mean
--- @0@ and standard deviation @sigma@.  
+-- @0@ and standard deviation @sigma@.
 -- This uses the Box-Mueller algorithm.
 getGaussian :: RNG -> Double -> IO Double
-getGaussian = getGaussianHelp gsl_ran_gaussian
-
--- | @getGaussianZiggurat r sigma@ gets a normal random variable with mean
--- @0@ and standard deviation @sigma@.  
--- This uses the Marsaglia-Tsang ziggurat algorithm.
-getGaussianZiggurat :: RNG -> Double -> IO Double
-getGaussianZiggurat = getGaussianHelp gsl_ran_gaussian_ziggurat
-
--- | @getGaussianRatioMethod r sigma@ gets a normal random variable with mean
--- @0@ and standard deviation @sigma@.  
--- This uses the Kinderman-Monahan-Leva ratio method.
-getGaussianRatioMethod:: RNG -> Double -> IO Double
-getGaussianRatioMethod = getGaussianHelp gsl_ran_gaussian_ratio_method
-
-getGaussianHelp :: (Ptr () -> CDouble -> IO CDouble) 
-                -> RNG -> Double -> IO Double
-getGaussianHelp ran_gaussian (MkRNG fptr) sigma  =
-    let sigma' = realToFrac sigma
-    in withForeignPtr fptr $ \ptr -> do
-        x <- ran_gaussian ptr sigma'
-        return $ realToFrac x
+getGaussian = liftRan1 gsl_ran_gaussian
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_gaussian :: Ptr () -> CDouble -> IO CDouble
+
+-- | @getGaussianZiggurat r sigma@ gets a normal random variable with mean
+-- @0@ and standard deviation @sigma@.
+-- This uses the Marsaglia-Tsang ziggurat algorithm.
+getGaussianZiggurat :: RNG -> Double -> IO Double
+getGaussianZiggurat = liftRan1 gsl_ran_gaussian_ziggurat
+
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_gaussian_ziggurat :: Ptr () -> CDouble -> IO CDouble
+
+-- | @getGaussianRatioMethod r sigma@ gets a normal random variable with mean
+-- @0@ and standard deviation @sigma@.
+-- This uses the Kinderman-Monahan-Leva ratio method.
+getGaussianRatioMethod:: RNG -> Double -> IO Double
+getGaussianRatioMethod = liftRan1 gsl_ran_gaussian_ratio_method
+
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_gaussian_ratio_method :: Ptr () -> CDouble -> IO CDouble
 
--- | @ugaussianPdf x@ computes the probabililty density p(x) for 
+-- | @ugaussianPdf x@ computes the probabililty density p(x) for
 -- a Gaussian distribution with mean @0@ and standard deviation @1@.
 ugaussianPdf :: Double -> Double
 ugaussianPdf = liftDouble gsl_ran_ugaussian_pdf
@@ -169,7 +163,7 @@ ugaussianPdf = liftDouble gsl_ran_ugaussian_pdf
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_ugaussian_pdf :: CDouble -> CDouble
 
--- | @ugaussianP x@ computes the cumulative distribution function P(x) for 
+-- | @ugaussianP x@ computes the cumulative distribution function P(x) for
 -- a Gaussian distribution with mean @0@ and standard deviation @1@.
 ugaussianP :: Double -> Double
 ugaussianP = liftDouble gsl_cdf_ugaussian_P
@@ -177,7 +171,7 @@ ugaussianP = liftDouble gsl_cdf_ugaussian_P
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_ugaussian_P :: CDouble -> CDouble
 
--- | @ugaussianQ x@ computes the cumulative distribution function Q(x) for 
+-- | @ugaussianQ x@ computes the cumulative distribution function Q(x) for
 -- a Gaussian distribution with mean @0@ and standard deviation @1@.
 ugaussianQ :: Double -> Double
 ugaussianQ = liftDouble gsl_cdf_ugaussian_Q
@@ -185,7 +179,7 @@ ugaussianQ = liftDouble gsl_cdf_ugaussian_Q
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_ugaussian_Q :: CDouble -> CDouble
 
--- | @ugaussianPInv p@ computes the inverse of the cumulative distribution 
+-- | @ugaussianPInv p@ computes the inverse of the cumulative distribution
 -- function of a Gaussian distribution with mean @0@ and standard deviation
 -- @1@. It returns @x@ such that @P(x) = p@.
 ugaussianPInv :: Double -> Double
@@ -194,7 +188,7 @@ ugaussianPInv = liftDouble gsl_cdf_ugaussian_Pinv
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_ugaussian_Pinv :: CDouble -> CDouble
 
--- | @ugaussianPInv q@ computes the inverse of the cumulative distribution 
+-- | @ugaussianPInv q@ computes the inverse of the cumulative distribution
 -- function of a Gaussian distribution with mean @0@ and standard deviation
 -- @1@. It returns @x@ such that @Q(x) = q@.
 ugaussianQInv :: Double -> Double
@@ -204,34 +198,27 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_ugaussian_Qinv :: CDouble -> CDouble
 
 -- | @getUGaussian r@ gets a normal random variable with mean
--- @0@ and standard deviation @1@.  
+-- @0@ and standard deviation @1@.
 -- This uses the Box-Mueller algorithm.
 getUGaussian :: RNG -> IO Double
-getUGaussian = getUGaussianHelp gsl_ran_ugaussian
-
--- | @getUGaussianRatioMethod r@ gets a normal random variable with mean
--- @0@ and standard deviation @1@.  
--- This uses the Kinderman-Monahan-Leva ratio method.
-getUGaussianRatioMethod:: RNG -> IO Double
-getUGaussianRatioMethod = getUGaussianHelp gsl_ran_ugaussian_ratio_method
-    
-getUGaussianHelp :: (Ptr () -> IO CDouble) 
-                -> RNG -> IO Double
-getUGaussianHelp ran_ugaussian (MkRNG fptr)  =
-    withForeignPtr fptr $ \ptr -> do
-        x <- ran_ugaussian ptr
-        return $ realToFrac x
+getUGaussian = liftRan0 gsl_ran_ugaussian
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_ugaussian :: Ptr () -> IO CDouble
+
+-- | @getUGaussianRatioMethod r@ gets a normal random variable with mean
+-- @0@ and standard deviation @1@.
+-- This uses the Kinderman-Monahan-Leva ratio method.
+getUGaussianRatioMethod:: RNG -> IO Double
+getUGaussianRatioMethod = liftRan0 gsl_ran_ugaussian_ratio_method
+
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_ugaussian_ratio_method :: Ptr () -> IO CDouble
 
 -- | @getExponential r mu@ gets a random exponential with mean @mu@.
 getExponential :: RNG -> Double -> IO Double
-getExponential (MkRNG f) mu = withForeignPtr f $ \p ->
-    liftM realToFrac $ gsl_ran_exponential p (realToFrac mu)
-    
+getExponential = liftRan1 gsl_ran_exponential
+
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_exponential :: Ptr () -> CDouble -> IO CDouble
 
@@ -240,19 +227,19 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 exponentialPdf :: Double -> Double -> Double
 exponentialPdf = liftDouble2 gsl_ran_exponential_pdf
 
-foreign import ccall unsafe "gsl/gsl_randist.h" 
+foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_exponential_pdf :: CDouble -> CDouble -> CDouble
 
 exponentialP :: Double -> Double -> Double
 exponentialP = liftDouble2 gsl_cdf_exponential_P
 
-foreign import ccall unsafe "gsl/gsl_randist.h" 
+foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_exponential_P :: CDouble -> CDouble -> CDouble
 
 exponentialQ :: Double -> Double -> Double
 exponentialQ = liftDouble2 gsl_cdf_exponential_Q
 
-foreign import ccall unsafe "gsl/gsl_randist.h" 
+foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_exponential_Q :: CDouble -> CDouble -> CDouble
 
 exponentialPInv :: Double -> Double -> Double
@@ -307,13 +294,8 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 
 -- | @getFlat r a b@ gets a value uniformly chosen in @[a,b)@.
 getFlat :: RNG -> Double -> Double -> IO (Double)
-getFlat (MkRNG fptr) a b  =
-    let a' = realToFrac a
-        b' = realToFrac b
-    in withForeignPtr fptr $ \ptr -> do
-            x <- gsl_ran_flat ptr a' b'
-            return $ realToFrac x
-        
+getFlat = liftRan2 gsl_ran_flat
+
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_flat :: Ptr () -> CDouble -> CDouble -> IO CDouble
 
@@ -321,10 +303,8 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 -- distribution with scale @c@ and exponent @alpha@.  The algorithm only
 -- works for @0 <= alpha <= 2@.
 getLevy :: RNG -> Double -> Double -> IO (Double)
-getLevy (MkRNG f) c alpha =
-    withForeignPtr f $ \p ->
-        realToFrac `fmap` gsl_ran_levy p (realToFrac c) (realToFrac alpha)
-        
+getLevy = liftRan2 gsl_ran_levy
+
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_levy :: Ptr () -> CDouble -> CDouble -> IO CDouble
 
@@ -333,14 +313,12 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 -- @beta@.  The skewness parameter must lie in the range @[-1,1]@.  The
 -- algorithm only works for @0 <= alpha <= 2@.
 getLevySkew :: RNG -> Double -> Double -> Double -> IO (Double)
-getLevySkew (MkRNG f) c alpha beta =
-    withForeignPtr f $ \p ->
-        realToFrac `fmap` gsl_ran_levy_skew p (realToFrac c) (realToFrac alpha) (realToFrac beta)
-        
+getLevySkew = liftRan3 gsl_ran_levy_skew
+
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_levy_skew :: Ptr () -> CDouble -> CDouble -> CDouble -> IO CDouble
 
--- | @poissonPdf k mu@ evaluates the probability density @p(k)@ at @k@ for 
+-- | @poissonPdf k mu@ evaluates the probability density @p(k)@ at @k@ for
 -- a Poisson distribution with mean @mu@.
 poissonPdf :: Int -> Double -> Double
 poissonPdf k = liftDouble $ gsl_ran_poisson_pdf (fromIntegral k)
@@ -348,7 +326,7 @@ poissonPdf k = liftDouble $ gsl_ran_poisson_pdf (fromIntegral k)
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_poisson_pdf :: CUInt -> CDouble -> CDouble
 
--- | @poissonP k mu@ evaluates the cumulative distribution function @P(k)@ 
+-- | @poissonP k mu@ evaluates the cumulative distribution function @P(k)@
 -- at @k@ for a Poisson distribution with mean @mu@.
 poissonP :: Int -> Double -> Double
 poissonP k = liftDouble $ gsl_cdf_poisson_P (fromIntegral k)
@@ -356,7 +334,7 @@ poissonP k = liftDouble $ gsl_cdf_poisson_P (fromIntegral k)
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_poisson_P :: CUInt -> CDouble -> CDouble
 
--- | @poissonQ k mu@ evaluates the cumulative distribution function @Q(k)@ 
+-- | @poissonQ k mu@ evaluates the cumulative distribution function @Q(k)@
 -- at @k@ for a Poisson distribution with mean @mu@.
 poissonQ :: Int -> Double -> Double
 poissonQ k = liftDouble $ gsl_cdf_poisson_Q (fromIntegral k)
@@ -364,15 +342,15 @@ poissonQ k = liftDouble $ gsl_cdf_poisson_Q (fromIntegral k)
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_poisson_Q :: CUInt -> CDouble -> CDouble
 
-    
+
 -- | @getPoisson r mu@ gets a poisson random variable with mean @mu@.
 getPoisson :: RNG -> Double -> IO Int
 getPoisson (MkRNG fptr) mu =
     let mu' = realToFrac mu
     in withForeignPtr fptr $ \ptr -> do
-        x <- gsl_ran_poisson ptr mu' 
+        x <- gsl_ran_poisson ptr mu'
         return $ fromIntegral x
-                    
+
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_poisson :: Ptr () -> CDouble -> IO CUInt
 
@@ -389,8 +367,7 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 
 -- | @getCauchy r a@ gets a random cauchy with scale @a@.
 getCauchy :: RNG -> Double -> IO Double
-getCauchy (MkRNG f) a = withForeignPtr f $ \p ->
-    liftM realToFrac $ gsl_ran_cauchy p (realToFrac a)
+getCauchy = liftRan1 gsl_ran_cauchy
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_cauchy :: Ptr () -> CDouble -> IO CDouble
@@ -421,18 +398,43 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 
 
 
-liftDouble :: (CDouble -> CDouble) 
+
+liftDouble :: (CDouble -> CDouble)
            -> Double -> Double
 liftDouble f x =
     realToFrac $ f (realToFrac x)
 
-liftDouble2 :: (CDouble -> CDouble -> CDouble) 
+liftDouble2 :: (CDouble -> CDouble -> CDouble)
            -> Double -> Double -> Double
 liftDouble2 f x y =
     realToFrac $ f (realToFrac x) (realToFrac y)
 
-liftDouble3 :: (CDouble -> CDouble -> CDouble -> CDouble) 
+liftDouble3 :: (CDouble -> CDouble -> CDouble -> CDouble)
            -> Double -> Double -> Double -> Double
 liftDouble3 f x y z =
     realToFrac $ f (realToFrac x) (realToFrac y) (realToFrac z)
 
+
+
+liftRan0 :: (Ptr () -> IO CDouble) -> RNG -> IO Double
+liftRan0 ran_fn (MkRNG fptr) =
+    withForeignPtr fptr $ \ptr ->
+    realToFrac <$> ran_fn ptr
+
+liftRan1 :: (Ptr () -> CDouble -> IO CDouble)
+         -> RNG -> Double -> IO Double
+liftRan1 ran_fn (MkRNG fptr) p =
+    withForeignPtr fptr $ \ptr ->
+    realToFrac <$> ran_fn ptr (realToFrac p)
+
+liftRan2 :: (Ptr () -> CDouble -> CDouble -> IO CDouble)
+         -> RNG -> Double -> Double -> IO Double
+liftRan2 ran_fn (MkRNG fptr) p q =
+    withForeignPtr fptr $ \ptr ->
+    realToFrac <$> ran_fn ptr (realToFrac p) (realToFrac q)
+
+liftRan3 :: (Ptr () -> CDouble -> CDouble -> CDouble -> IO CDouble)
+         -> RNG -> Double -> Double -> Double -> IO Double
+liftRan3 ran_fn (MkRNG fptr) p q r =
+    withForeignPtr fptr $ \ptr ->
+    realToFrac <$> ran_fn ptr (realToFrac p) (realToFrac q) (realToFrac r)
