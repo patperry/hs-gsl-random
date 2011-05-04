@@ -75,7 +75,16 @@ module GSL.Random.Dist (
     cauchyP,
     cauchyQ,
     cauchyPInv,
-    cauchyQInv
+    cauchyQInv,
+
+    -- * The Beta Distribution
+    getBeta,
+
+    betaPdf,
+    betaP,
+    betaQ,
+    betaPInv,
+    betaQInv
 
     ) where
 
@@ -413,6 +422,49 @@ cauchyQInv = liftDouble2 gsl_cdf_cauchy_Qinv
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_cauchy_Qinv :: CDouble -> CDouble -> CDouble
+
+
+
+
+-- | @betaPdf x a b@ evaluates the probability density @p(x)@ at @x@
+-- for a Beta distribution with parameters @a@ and @b@.  The density
+-- is given by @p(x) dx = {\Gamma(a+b) \over \Gamma(a) \Gamma(b)} x^{a-1} (1-x)^{b-1} dx@.
+betaPdf :: Double -> Double -> Double -> Double
+betaPdf = liftDouble3 gsl_ran_beta_pdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_beta_pdf :: CDouble -> CDouble -> CDouble -> CDouble
+
+-- | @getBeta r a b@ gets a random beta with parameters @a@ ad @b@.
+getBeta :: RNG -> Double -> Double -> IO Double
+getBeta = liftRan2 gsl_ran_beta
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_beta :: Ptr () -> CDouble -> CDouble -> IO CDouble
+
+betaP :: Double -> Double -> Double -> Double
+betaP = liftDouble3 gsl_cdf_beta_P
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_beta_P :: CDouble -> CDouble -> CDouble -> CDouble
+
+betaQ :: Double -> Double -> Double -> Double
+betaQ = liftDouble3 gsl_cdf_beta_Q
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_beta_Q :: CDouble -> CDouble -> CDouble -> CDouble
+
+betaPInv :: Double -> Double -> Double -> Double
+betaPInv = liftDouble3 gsl_cdf_beta_Pinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_beta_Pinv :: CDouble -> CDouble -> CDouble -> CDouble
+
+betaQInv :: Double -> Double -> Double -> Double
+betaQInv = liftDouble3 gsl_cdf_beta_Qinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_beta_Qinv :: CDouble -> CDouble -> CDouble -> CDouble
 
 
 
