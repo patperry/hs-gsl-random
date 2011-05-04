@@ -123,12 +123,21 @@ module GSL.Random.Dist (
     gammaPInv,
     gammaQInv,
 
+    -- * The Dirichlet Distribution
+    getDirichlet,
+
+    dirichletPdf,
+    dirichletLnPdf,
+
     ) where
 
 import Control.Applicative  ( (<$>) )
-import Foreign.C.Types      ( CUInt, CDouble )
-import Foreign.ForeignPtr   ( withForeignPtr )
+import Foreign.C.Types      ( CUInt, CDouble, CSize )
+import Foreign.ForeignPtr   ( withForeignPtr, mallocForeignPtrArray )
 import Foreign.Ptr          ( Ptr )
+import System.IO.Unsafe     ( unsafePerformIO )
+
+import qualified Data.Vector.Storable as VS
 
 import GSL.Random.Gen.Internal ( RNG(..) )
 
@@ -685,6 +694,61 @@ gammaQInv = liftDouble3 gsl_cdf_gamma_Qinv
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_gamma_Qinv :: CDouble -> CDouble -> CDouble -> CDouble
+
+
+
+-- | @dirichletPdf xs alphas@ evaluates the probability density
+-- @p(xs)@ at @xs@ for a Dirichlet distribution with parameters
+-- @alphas@, where all @alphas@ are positive (strictly greater
+-- than zero).  Note that @xs@ and @alphas@ should have the same
+-- length.
+dirichletPdf :: VS.Vector Double -- ^ @xs@
+             -> VS.Vector Double -- ^ @alphas@
+             -> Double
+dirichletPdf = dirichletPdfHelper gsl_ran_dirichlet_pdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_dirichlet_pdf :: CSize -> Ptr Double -> Ptr Double -> CDouble
+
+-- | @dirichletLnPdf xs alphas == log (dirichletPdf xs alphas)@,
+--   but more efficient.
+dirichletLnPdf :: VS.Vector Double -- ^ @xs@
+               -> VS.Vector Double -- ^ @alphas@
+               -> Double
+dirichletLnPdf = dirichletPdfHelper gsl_ran_dirichlet_lnpdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_dirichlet_lnpdf :: CSize -> Ptr Double -> Ptr Double -> CDouble
+
+dirichletPdfHelper :: (CSize -> Ptr Double -> Ptr Double -> CDouble)
+                   -> VS.Vector Double -> VS.Vector Double -> Double
+dirichletPdfHelper f xs alphas
+    | len /= len2 = error "dirichletPdf*: different lengths"
+    | otherwise   = unsafePerformIO $
+                    VS.unsafeWith xs     $ \xs_ptr ->
+                    VS.unsafeWith alphas $ \alphas_ptr ->
+                    return $ realToFrac $ f lenS alphas_ptr xs_ptr
+    where
+      len  = VS.length xs
+      len2 = VS.length alphas
+      lenS = fromIntegral len
+
+-- | @getDirichlet r alphas@ gets a random sample from a
+-- Dirichlet distribution with parameters @alphas@, where all
+-- @alphas@ are positive.
+getDirichlet :: RNG -> VS.Vector Double -> IO (VS.Vector Double)
+getDirichlet (MkRNG rng_fptr) alphas =
+    withForeignPtr rng_fptr $ \rng_ptr ->
+    VS.unsafeWith alphas    $ \alphas_ptr -> do
+      let len = VS.length alphas
+      ret_fptr <- mallocForeignPtrArray len
+      withForeignPtr ret_fptr $ \ret_ptr ->
+        gsl_ran_dirichlet rng_ptr (fromIntegral len) alphas_ptr ret_ptr
+      return (VS.unsafeFromForeignPtr ret_fptr 0 len)
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_dirichlet :: Ptr () -> CSize -> Ptr Double -> Ptr Double -> IO ()
+
 
 
 
