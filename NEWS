@@ -1,7 +1,7 @@
 Changes in 0.4.2
 * Depend on the vector package.
-* Add many distributions: beta, logistic, Pareto, Weibull, gamma
-  and Dirichlet distributions are now available.
+* Add many distributions: beta, logistic, Pareto, Weibull, gamma,
+  multinomial and Dirichlet distributions are now available.
 
 Changes in 0.4.1
 * Require cabal >= 1.8
