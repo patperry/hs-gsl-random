@@ -84,7 +84,16 @@ module GSL.Random.Dist (
     betaP,
     betaQ,
     betaPInv,
-    betaQInv
+    betaQInv,
+
+    -- * The Logistic Distribution
+    getLogistic,
+
+    logisticPdf,
+    logisticP,
+    logisticQ,
+    logisticPInv,
+    logisticQInv,
 
     ) where
 
@@ -466,6 +475,49 @@ betaQInv = liftDouble3 gsl_cdf_beta_Qinv
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_beta_Qinv :: CDouble -> CDouble -> CDouble -> CDouble
+
+
+
+
+-- | @logisticPdf x a@ evaluates the probability density @p(x)@ at @x@
+-- for a logistic distribution with scale parameter @a@.  The density
+-- is given by @p(x) dx = { \exp(-x/a) \over a (1 + \exp(-x/a))^2 } dx@.
+logisticPdf :: Double -> Double -> Double
+logisticPdf = liftDouble2 gsl_ran_logistic_pdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_logistic_pdf :: CDouble -> CDouble -> CDouble
+
+-- | @getLogistic r a@ gets a random logistic with scale @a@.
+getLogistic :: RNG -> Double -> IO Double
+getLogistic = liftRan1 gsl_ran_logistic
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_logistic :: Ptr () -> CDouble -> IO CDouble
+
+logisticP :: Double -> Double -> Double
+logisticP = liftDouble2 gsl_cdf_logistic_P
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_logistic_P :: CDouble -> CDouble -> CDouble
+
+logisticQ :: Double -> Double -> Double
+logisticQ = liftDouble2 gsl_cdf_logistic_Q
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_logistic_Q :: CDouble -> CDouble -> CDouble
+
+logisticPInv :: Double -> Double -> Double
+logisticPInv = liftDouble2 gsl_cdf_logistic_Pinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_logistic_Pinv :: CDouble -> CDouble -> CDouble
+
+logisticQInv :: Double -> Double -> Double
+logisticQInv = liftDouble2 gsl_cdf_logistic_Qinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_logistic_Qinv :: CDouble -> CDouble -> CDouble
 
 
 
