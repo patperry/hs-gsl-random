@@ -104,6 +104,15 @@ module GSL.Random.Dist (
     paretoPInv,
     paretoQInv,
 
+    -- * The Weibull Distribution
+    getWeibull,
+
+    weibullPdf,
+    weibullP,
+    weibullQ,
+    weibullPInv,
+    weibullQInv,
+
     ) where
 
 import Control.Applicative  ( (<$>) )
@@ -570,6 +579,49 @@ paretoQInv = liftDouble3 gsl_cdf_pareto_Qinv
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_pareto_Qinv :: CDouble -> CDouble -> CDouble -> CDouble
+
+
+
+
+-- | @weibullPdf x a b@ evaluates the probability density @p(x)@ at @x@
+-- for a Weibull distribution with scale @a@ and exponent @b@.  The density
+-- is given by @p(x) dx = {b \over a^b} x^{b-1}  \exp(-(x/a)^b) dx@ for @x >= 0@.
+weibullPdf :: Double -> Double -> Double -> Double
+weibullPdf = liftDouble3 gsl_ran_weibull_pdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_weibull_pdf :: CDouble -> CDouble -> CDouble -> CDouble
+
+-- | @getWeibull r a b@ gets a random Weibull with scale @a@ and exponent @b@.
+getWeibull :: RNG -> Double -> Double -> IO Double
+getWeibull = liftRan2 gsl_ran_weibull
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_weibull :: Ptr () -> CDouble -> CDouble -> IO CDouble
+
+weibullP :: Double -> Double -> Double -> Double
+weibullP = liftDouble3 gsl_cdf_weibull_P
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_weibull_P :: CDouble -> CDouble -> CDouble -> CDouble
+
+weibullQ :: Double -> Double -> Double -> Double
+weibullQ = liftDouble3 gsl_cdf_weibull_Q
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_weibull_Q :: CDouble -> CDouble -> CDouble -> CDouble
+
+weibullPInv :: Double -> Double -> Double -> Double
+weibullPInv = liftDouble3 gsl_cdf_weibull_Pinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_weibull_Pinv :: CDouble -> CDouble -> CDouble -> CDouble
+
+weibullQInv :: Double -> Double -> Double -> Double
+weibullQInv = liftDouble3 gsl_cdf_weibull_Qinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_weibull_Qinv :: CDouble -> CDouble -> CDouble -> CDouble
 
 
 
