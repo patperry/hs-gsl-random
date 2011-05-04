@@ -155,6 +155,9 @@ getGaussianRatioMethod = liftRan1 gsl_ran_gaussian_ratio_method
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_gaussian_ratio_method :: Ptr () -> CDouble -> IO CDouble
 
+
+
+
 -- | @ugaussianPdf x@ computes the probabililty density p(x) for
 -- a Gaussian distribution with mean @0@ and standard deviation @1@.
 ugaussianPdf :: Double -> Double
@@ -215,44 +218,9 @@ getUGaussianRatioMethod = liftRan0 gsl_ran_ugaussian_ratio_method
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_ugaussian_ratio_method :: Ptr () -> IO CDouble
 
--- | @getExponential r mu@ gets a random exponential with mean @mu@.
-getExponential :: RNG -> Double -> IO Double
-getExponential = liftRan1 gsl_ran_exponential
 
-foreign import ccall unsafe "gsl/gsl_randist.h"
-    gsl_ran_exponential :: Ptr () -> CDouble -> IO CDouble
 
--- | @exponentialPdf x mu@ computes the density at @x@ of an exponential
--- with mean @mu@.
-exponentialPdf :: Double -> Double -> Double
-exponentialPdf = liftDouble2 gsl_ran_exponential_pdf
 
-foreign import ccall unsafe "gsl/gsl_randist.h"
-    gsl_ran_exponential_pdf :: CDouble -> CDouble -> CDouble
-
-exponentialP :: Double -> Double -> Double
-exponentialP = liftDouble2 gsl_cdf_exponential_P
-
-foreign import ccall unsafe "gsl/gsl_randist.h"
-    gsl_cdf_exponential_P :: CDouble -> CDouble -> CDouble
-
-exponentialQ :: Double -> Double -> Double
-exponentialQ = liftDouble2 gsl_cdf_exponential_Q
-
-foreign import ccall unsafe "gsl/gsl_randist.h"
-    gsl_cdf_exponential_Q :: CDouble -> CDouble -> CDouble
-
-exponentialPInv :: Double -> Double -> Double
-exponentialPInv = liftDouble2 gsl_cdf_exponential_Pinv
-
-foreign import ccall unsafe "gsl/gsl_randist.h"
-    gsl_cdf_exponential_Pinv :: CDouble -> CDouble -> CDouble
-
-exponentialQInv :: Double -> Double -> Double
-exponentialQInv = liftDouble2 gsl_cdf_exponential_Qinv
-
-foreign import ccall unsafe "gsl/gsl_randist.h"
-    gsl_cdf_exponential_Qinv :: CDouble -> CDouble -> CDouble
 
 -- | @flatPdf x a b@ computes the probability density @p(x)@ at @x@ for
 -- a uniform distribution from @a@ to @b@.
@@ -299,6 +267,51 @@ getFlat = liftRan2 gsl_ran_flat
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_flat :: Ptr () -> CDouble -> CDouble -> IO CDouble
 
+
+
+
+-- | @getExponential r mu@ gets a random exponential with mean @mu@.
+getExponential :: RNG -> Double -> IO Double
+getExponential = liftRan1 gsl_ran_exponential
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_exponential :: Ptr () -> CDouble -> IO CDouble
+
+-- | @exponentialPdf x mu@ computes the density at @x@ of an exponential
+-- with mean @mu@.
+exponentialPdf :: Double -> Double -> Double
+exponentialPdf = liftDouble2 gsl_ran_exponential_pdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_exponential_pdf :: CDouble -> CDouble -> CDouble
+
+exponentialP :: Double -> Double -> Double
+exponentialP = liftDouble2 gsl_cdf_exponential_P
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_exponential_P :: CDouble -> CDouble -> CDouble
+
+exponentialQ :: Double -> Double -> Double
+exponentialQ = liftDouble2 gsl_cdf_exponential_Q
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_exponential_Q :: CDouble -> CDouble -> CDouble
+
+exponentialPInv :: Double -> Double -> Double
+exponentialPInv = liftDouble2 gsl_cdf_exponential_Pinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_exponential_Pinv :: CDouble -> CDouble -> CDouble
+
+exponentialQInv :: Double -> Double -> Double
+exponentialQInv = liftDouble2 gsl_cdf_exponential_Qinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_exponential_Qinv :: CDouble -> CDouble -> CDouble
+
+
+
+
 -- | @getLevy r c alpha@ gets a variate from the Levy symmetric stable
 -- distribution with scale @c@ and exponent @alpha@.  The algorithm only
 -- works for @0 <= alpha <= 2@.
@@ -317,6 +330,10 @@ getLevySkew = liftRan3 gsl_ran_levy_skew
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_levy_skew :: Ptr () -> CDouble -> CDouble -> CDouble -> IO CDouble
+
+
+
+
 
 -- | @poissonPdf k mu@ evaluates the probability density @p(k)@ at @k@ for
 -- a Poisson distribution with mean @mu@.
@@ -353,6 +370,7 @@ getPoisson (MkRNG fptr) mu =
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_poisson :: Ptr () -> CDouble -> IO CUInt
+
 
 
 
@@ -398,6 +416,8 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 
 
 
+
+-- Helper functions
 
 liftDouble :: (CDouble -> CDouble)
            -> Double -> Double
