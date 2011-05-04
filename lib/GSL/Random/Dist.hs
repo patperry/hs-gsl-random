@@ -95,6 +95,15 @@ module GSL.Random.Dist (
     logisticPInv,
     logisticQInv,
 
+    -- * The Pareto Distribution
+    getPareto,
+
+    paretoPdf,
+    paretoP,
+    paretoQ,
+    paretoPInv,
+    paretoQInv,
+
     ) where
 
 import Control.Applicative  ( (<$>) )
@@ -518,6 +527,49 @@ logisticQInv = liftDouble2 gsl_cdf_logistic_Qinv
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_cdf_logistic_Qinv :: CDouble -> CDouble -> CDouble
+
+
+
+
+-- | @paretoPdf x a b@ evaluates the probability density @p(x)@ at @x@
+-- for a Pareto distribution with exponent @a@ and scale @b@.  The density
+-- is given by @p(x) dx = (a/b) / (x/b)^{a+1} dx@ for @x >= b@.
+paretoPdf :: Double -> Double -> Double -> Double
+paretoPdf = liftDouble3 gsl_ran_pareto_pdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_pareto_pdf :: CDouble -> CDouble -> CDouble -> CDouble
+
+-- | @getPareto r a b@ gets a random Pareto with exponent @a@ and scale @b@.
+getPareto :: RNG -> Double -> Double -> IO Double
+getPareto = liftRan2 gsl_ran_pareto
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_pareto :: Ptr () -> CDouble -> CDouble -> IO CDouble
+
+paretoP :: Double -> Double -> Double -> Double
+paretoP = liftDouble3 gsl_cdf_pareto_P
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_pareto_P :: CDouble -> CDouble -> CDouble -> CDouble
+
+paretoQ :: Double -> Double -> Double -> Double
+paretoQ = liftDouble3 gsl_cdf_pareto_Q
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_pareto_Q :: CDouble -> CDouble -> CDouble -> CDouble
+
+paretoPInv :: Double -> Double -> Double -> Double
+paretoPInv = liftDouble3 gsl_cdf_pareto_Pinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_pareto_Pinv :: CDouble -> CDouble -> CDouble -> CDouble
+
+paretoQInv :: Double -> Double -> Double -> Double
+paretoQInv = liftDouble3 gsl_cdf_pareto_Qinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_pareto_Qinv :: CDouble -> CDouble -> CDouble -> CDouble
 
 
 
