@@ -428,7 +428,8 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 
 -- | @betaPdf x a b@ evaluates the probability density @p(x)@ at @x@
 -- for a Beta distribution with parameters @a@ and @b@.  The density
--- is given by @p(x) dx = {\Gamma(a+b) \over \Gamma(a) \Gamma(b)} x^{a-1} (1-x)^{b-1} dx@.
+-- is given by @p(x) dx = {\Gamma(a+b) \over \Gamma(a) \Gamma(b)} x^{a-1} (1-x)^{b-1} dx@
+-- for @0 <= x <= 1@.
 betaPdf :: Double -> Double -> Double -> Double
 betaPdf = liftDouble3 gsl_ran_beta_pdf
 
