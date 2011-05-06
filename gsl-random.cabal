@@ -30,8 +30,6 @@ library
     c-sources:          cbits/qrng_extras.c
 
     ghc-options:        -Wall
-    if !os(darwin)
-        cc-options:     -fPIC
     extensions:         ForeignFunctionInterface
     build-depends:      base   >= 4       && < 5
                       , vector >= 0.7.0.1 && < 0.8

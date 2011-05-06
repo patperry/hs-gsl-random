@@ -2,6 +2,8 @@ Changes in 0.4.2
 * Depend on the vector package.
 * Add many distributions: beta, logistic, Pareto, Weibull, gamma
   and Dirichlet distributions are now available.
+* Remove -fPIC flag when compiling C code
+  (fixes https://github.com/patperry/hs-gsl-random/issues/1)
 
 Changes in 0.4.1
 * Require cabal >= 1.8
