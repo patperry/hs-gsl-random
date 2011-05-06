@@ -123,6 +123,12 @@ module GSL.Random.Dist (
     gammaPInv,
     gammaQInv,
 
+    -- * The Multinomial Distribution
+    getMultinomial,
+
+    multinomialPdf,
+    multinomialLnPdf,
+
     -- * The Dirichlet Distribution
     getDirichlet,
 
@@ -697,6 +703,42 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 
 
 
+-- | @multinomialPdf ns ps@ evaluates the probability density
+-- @p(ns)@ at @ns@ for a multinomial distribution with parameters
+-- @ps@, where all @ps@ are non-negative and sum to @1@.  Note
+-- that @xs@ and @alphas@ should have the same length.
+multinomialPdf :: VS.Vector Int    -- ^ @ns@
+               -> VS.Vector Double -- ^ @ps@
+               -> Double
+multinomialPdf = vectorPdfHelper "multinomialPdf" gsl_ran_multinomial_pdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_multinomial_pdf :: CSize -> Ptr Double -> Ptr Int -> CDouble
+
+-- | @multinomialLnPdf xs alphas == log (multinomialPdf xs alphas)@,
+--   but more efficient.
+multinomialLnPdf :: VS.Vector Int    -- ^ @ns@
+                 -> VS.Vector Double -- ^ @ps@
+                 -> Double
+multinomialLnPdf = vectorPdfHelper "multinomialLnPdf" gsl_ran_multinomial_lnpdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_multinomial_lnpdf :: CSize -> Ptr Double -> Ptr Int -> CDouble
+
+-- | @getMultinomial r n ps@ gets a random sample from a
+-- multinomial distribution with parameters @ps@ formed by @n@
+-- trials.
+getMultinomial :: RNG -> Int -> VS.Vector Double -> IO (VS.Vector Int)
+getMultinomial rng n = vectorGetHelper f rng
+    where
+      f r k = gsl_ran_multinomial r k (fromIntegral n)
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_multinomial :: Ptr () -> CSize -> CUInt -> Ptr Double -> Ptr Int -> IO ()
+
+
+
+
 -- | @dirichletPdf xs alphas@ evaluates the probability density
 -- @p(xs)@ at @xs@ for a Dirichlet distribution with parameters
 -- @alphas@, where all @alphas@ are positive (strictly greater
@@ -705,7 +747,7 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 dirichletPdf :: VS.Vector Double -- ^ @xs@
              -> VS.Vector Double -- ^ @alphas@
              -> Double
-dirichletPdf = dirichletPdfHelper gsl_ran_dirichlet_pdf
+dirichletPdf = vectorPdfHelper "dirichletPdf" gsl_ran_dirichlet_pdf
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_dirichlet_pdf :: CSize -> Ptr Double -> Ptr Double -> CDouble
@@ -715,36 +757,16 @@ foreign import ccall unsafe "gsl/gsl_randist.h"
 dirichletLnPdf :: VS.Vector Double -- ^ @xs@
                -> VS.Vector Double -- ^ @alphas@
                -> Double
-dirichletLnPdf = dirichletPdfHelper gsl_ran_dirichlet_lnpdf
+dirichletLnPdf = vectorPdfHelper "dirichletLnPdf" gsl_ran_dirichlet_lnpdf
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_dirichlet_lnpdf :: CSize -> Ptr Double -> Ptr Double -> CDouble
-
-dirichletPdfHelper :: (CSize -> Ptr Double -> Ptr Double -> CDouble)
-                   -> VS.Vector Double -> VS.Vector Double -> Double
-dirichletPdfHelper f xs alphas
-    | len /= len2 = error "dirichletPdf*: different lengths"
-    | otherwise   = unsafePerformIO $
-                    VS.unsafeWith xs     $ \xs_ptr ->
-                    VS.unsafeWith alphas $ \alphas_ptr ->
-                    return $ realToFrac $ f lenS alphas_ptr xs_ptr
-    where
-      len  = VS.length xs
-      len2 = VS.length alphas
-      lenS = fromIntegral len
 
 -- | @getDirichlet r alphas@ gets a random sample from a
 -- Dirichlet distribution with parameters @alphas@, where all
 -- @alphas@ are positive.
 getDirichlet :: RNG -> VS.Vector Double -> IO (VS.Vector Double)
-getDirichlet (MkRNG rng_fptr) alphas =
-    withForeignPtr rng_fptr $ \rng_ptr ->
-    VS.unsafeWith alphas    $ \alphas_ptr -> do
-      let len = VS.length alphas
-      ret_fptr <- mallocForeignPtrArray len
-      withForeignPtr ret_fptr $ \ret_ptr ->
-        gsl_ran_dirichlet rng_ptr (fromIntegral len) alphas_ptr ret_ptr
-      return (VS.unsafeFromForeignPtr ret_fptr 0 len)
+getDirichlet = vectorGetHelper gsl_ran_dirichlet
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_dirichlet :: Ptr () -> CSize -> Ptr Double -> Ptr Double -> IO ()
@@ -794,3 +816,33 @@ liftRan3 :: (Ptr () -> CDouble -> CDouble -> CDouble -> IO CDouble)
 liftRan3 ran_fn (MkRNG fptr) p q r =
     withForeignPtr fptr $ \ptr ->
     realToFrac <$> ran_fn ptr (realToFrac p) (realToFrac q) (realToFrac r)
+
+
+
+vectorPdfHelper :: (VS.Storable a, VS.Storable b) =>
+                   String -> (CSize -> Ptr a -> Ptr b -> CDouble)
+                -> VS.Vector b -> VS.Vector a -> Double
+vectorPdfHelper name f xs alphas
+    | len /= len2 = error $ name ++ ": different lengths"
+    | otherwise   = unsafePerformIO $
+                    VS.unsafeWith xs     $ \xs_ptr ->
+                    VS.unsafeWith alphas $ \alphas_ptr ->
+                    return $ realToFrac $ f lenS alphas_ptr xs_ptr
+    where
+      len  = VS.length xs
+      len2 = VS.length alphas
+      lenS = fromIntegral len
+{-# INLINE vectorPdfHelper #-}
+
+vectorGetHelper :: (VS.Storable a, VS.Storable b) =>
+                   (Ptr () -> CSize -> Ptr a -> Ptr b -> IO ())
+                -> RNG -> VS.Vector a -> IO (VS.Vector b)
+vectorGetHelper f (MkRNG rng_fptr) alphas =
+    withForeignPtr rng_fptr $ \rng_ptr ->
+    VS.unsafeWith alphas    $ \alphas_ptr -> do
+      let len = VS.length alphas
+      ret_fptr <- mallocForeignPtrArray len
+      withForeignPtr ret_fptr $ \ret_ptr ->
+        f rng_ptr (fromIntegral len) alphas_ptr ret_ptr
+      return (VS.unsafeFromForeignPtr ret_fptr 0 len)
+{-# INLINE vectorGetHelper #-}

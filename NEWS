@@ -1,3 +1,6 @@
+Changes in 0.4.3
+* Felipe Lessa added the multinomial distribution.
+
 Changes in 0.4.2
 * Depend on the vector package.
 * Felipe Lessa added beta, logistic, Pareto, Weibull, gamma
