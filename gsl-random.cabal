@@ -1,5 +1,5 @@
 name:            gsl-random
-version:         0.4.3
+version:         0.4.4
 homepage:        http://github.com/patperry/hs-gsl-random
 synopsis:        Bindings the the GSL random number generation facilities.
 description:
@@ -16,7 +16,7 @@ author:          Patrick Perry,
 maintainer:      Patrick Perry <patperry@gmail.com>
 cabal-version:   >= 1.8.0
 build-type:      Custom
-tested-with:     GHC == 6.12.3
+tested-with:     GHC == 7.4.2
 
 extra-source-files:     NEWS
 
@@ -32,4 +32,4 @@ library
     ghc-options:        -Wall
     extensions:         ForeignFunctionInterface
     build-depends:      base   >= 4       && < 5
-                      , vector >= 0.7.0.1 && < 0.8
+                      , vector >= 0.7.0.1 && < 0.10

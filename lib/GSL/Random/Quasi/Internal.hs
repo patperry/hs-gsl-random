@@ -41,10 +41,12 @@ module GSL.Random.Quasi.Internal (
 
     ) where
 
-import Control.Monad
-import Foreign
-import Foreign.C.String
-import Foreign.C.Types
+import Control.Monad( liftM )
+import Foreign( ForeignPtr, FunPtr, Ptr, Word8, Word64, allocaArray,
+    newForeignPtr, peekArray, pokeArray, withForeignPtr )
+import Foreign.C.String( CString, peekCAString )
+import Foreign.C.Types( CInt(..), CSize(..), CUInt(..) )
+import System.IO.Unsafe( unsafePerformIO )
 
 newtype QRNG     = MkQRNG (ForeignPtr QRNG)
 newtype QRNGType = MkQRNGType (Ptr QRNGType)

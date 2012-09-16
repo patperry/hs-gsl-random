@@ -138,7 +138,7 @@ module GSL.Random.Dist (
     ) where
 
 import Control.Applicative  ( (<$>) )
-import Foreign.C.Types      ( CUInt, CDouble, CSize )
+import Foreign.C.Types      ( CUInt(..), CDouble(..), CSize(..) )
 import Foreign.ForeignPtr   ( withForeignPtr, mallocForeignPtrArray )
 import Foreign.Ptr          ( Ptr )
 import System.IO.Unsafe     ( unsafePerformIO )

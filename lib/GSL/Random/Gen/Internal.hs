@@ -12,17 +12,17 @@ module GSL.Random.Gen.Internal (
     -- * Data types
     RNG(..),
     RNGType,
-    
+
     -- * Initializing
     newRNG,
     setSeed,
-    
+
     -- * Sampling
     getSample,
     getUniform,
     getUniformPos,
     getUniformInt,
-    
+
     -- * Auxiliary functions
     getName,
     getMax,
@@ -30,7 +30,7 @@ module GSL.Random.Gen.Internal (
     getSize,
     getState,
     setState,
-    
+
     -- * Copying state
     copyRNG,
     cloneRNG,
@@ -38,14 +38,17 @@ module GSL.Random.Gen.Internal (
     -- * Algorithms
     mt19937,
     rngType,
-    
+
     ) where
-       
-import Control.Monad
-import Data.Maybe ( fromJust )
-import Foreign
-import Foreign.C.String
-import Foreign.C.Types
+
+import Control.Monad( liftM )
+import Data.Maybe( fromJust )
+import Foreign( ForeignPtr, FunPtr, Ptr, Word8, Word64, advancePtr, castPtr,
+    peek, peekArray, pokeArray, newForeignPtr, nullPtr, withForeignPtr )
+import Foreign.C.String( CString, peekCAString, withCAString )
+import Foreign.C.Types( CDouble(..), CInt(..), CSize(..), CULong(..) )
+import System.IO.Unsafe( unsafePerformIO )
+
 
 newtype RNG     = MkRNG (ForeignPtr ())
 newtype RNGType = MkRNGType (Ptr ())
@@ -75,7 +78,7 @@ setSeed (MkRNG fptr) seed =
 
 foreign import ccall unsafe "gsl/gsl_rng.h"
     gsl_rng_set :: Ptr () -> CULong -> IO ()
-    
+
 
 --------------------------- Sampling ----------------------------------------
 
@@ -84,7 +87,7 @@ getSample :: RNG -> IO Word64
 getSample (MkRNG fptr) =
     withForeignPtr fptr $ \ptr ->
         gsl_rng_get ptr >>= return . fromInteger . toInteger
-    
+
 foreign import ccall unsafe "gsl/gsl_rng.h"
     gsl_rng_get :: Ptr () -> IO CULong
 
@@ -93,7 +96,7 @@ getUniform :: RNG -> IO Double
 getUniform (MkRNG fptr) =
     withForeignPtr fptr $ \ptr ->
         gsl_rng_uniform ptr >>= return . realToFrac
-    
+
 foreign import ccall unsafe "gsl/gsl_rng.h"
     gsl_rng_uniform :: Ptr () -> IO CDouble
 
@@ -108,16 +111,16 @@ foreign import ccall unsafe "gsl/gsl_rng.h"
 
 -- | Returns an integer uniform on [0,n-1].  @n@ must be greater than @0@.
 getUniformInt :: RNG -> Int -> IO Int
-getUniformInt (MkRNG fptr) n 
+getUniformInt (MkRNG fptr) n
     | n <= 0 =
-        ioError $ userError $ 
+        ioError $ userError $
             "rngUnifInt: expected \"n\" to be greater than 0" ++
             " but got `" ++ show n ++ "' instead."
     | otherwise =
         let n' = (fromInteger . toInteger) n
         in withForeignPtr fptr $ \ptr ->
             gsl_rng_uniform_int ptr n' >>= return . fromInteger . toInteger
-    
+
 foreign import ccall unsafe "gsl/gsl_rng.h"
     gsl_rng_uniform_int :: Ptr () -> CULong -> IO CULong
 
@@ -129,7 +132,7 @@ getName :: RNG -> IO String
 getName (MkRNG fptr) =
     withForeignPtr fptr $ \ptr ->
          peekCAString (gsl_rng_name ptr)
-    
+
 foreign import ccall unsafe "gsl/gsl_rng.h"
     gsl_rng_name :: Ptr () -> CString
 
@@ -138,7 +141,7 @@ getMax :: RNG -> IO Word64
 getMax (MkRNG fptr) =
     withForeignPtr fptr $ \ptr ->
         (return . fromInteger . toInteger) (gsl_rng_max ptr)
-        
+
 foreign import ccall unsafe "gsl/gsl_rng.h"
     gsl_rng_max :: Ptr () -> CULong
 
@@ -147,7 +150,7 @@ getMin :: RNG -> IO Word64
 getMin (MkRNG fptr) =
     withForeignPtr fptr $ \ptr ->
         (return . fromInteger . toInteger) (gsl_rng_min ptr)
-        
+
 foreign import ccall unsafe "gsl/gsl_rng.h"
     gsl_rng_min :: Ptr () -> CULong
 
@@ -166,7 +169,7 @@ getState rng@(MkRNG fptr) = do
     n <- liftM (fromInteger . toInteger) (getSize rng)
     withForeignPtr fptr $ \ptr ->
         peekArray n (gsl_rng_state ptr)
-        
+
 foreign import ccall unsafe "gsl/gsl_rng.h"
     gsl_rng_state :: Ptr () -> Ptr Word8
 
@@ -186,7 +189,7 @@ copyRNG (MkRNG fdst) (MkRNG fsrc) =
     withForeignPtr fdst $ \dst ->
         withForeignPtr fsrc $ \src ->
             gsl_rng_memcpy dst src
-            
+
 foreign import ccall unsafe "gsl/gsl_rng.h"
     gsl_rng_memcpy :: Ptr () -> Ptr () -> IO ()
 
@@ -220,18 +223,18 @@ getRngType name =
         go :: Ptr (Ptr ()) -> IO (Maybe RNGType)
         go types = do
             t <- peek types
-            if t == nullPtr 
+            if t == nullPtr
               then
                 return Nothing
-                
+
               else do
                 name' <- peek (castPtr t)
                 cmp   <- c_strcmp name name'
-                
+
                 if cmp == 0
                   then return $ Just (MkRNGType t)
                   else go $ types `advancePtr` 1
-                    
+
 foreign import ccall unsafe "string.h strcmp"
     c_strcmp :: CString -> CString -> IO CInt
 

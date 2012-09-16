@@ -1,3 +1,6 @@
+Changes in 0.4.4
+* Compile fixes for GHC 7.4.2
+
 Changes in 0.4.3
 * Felipe Lessa added the multinomial distribution.
 
