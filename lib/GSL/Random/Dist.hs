@@ -95,6 +95,15 @@ module GSL.Random.Dist (
     logisticPInv,
     logisticQInv,
 
+    -- * The Log-Normal Distribution
+    getLognormal,
+
+    lognormalPdf,
+    lognormalP,
+    lognormalQ,
+    lognormalPInv,
+    lognormalQInv,
+
     -- * The Pareto Distribution
     getPareto,
 
@@ -770,6 +779,51 @@ getDirichlet = vectorGetHelper gsl_ran_dirichlet
 
 foreign import ccall unsafe "gsl/gsl_randist.h"
     gsl_ran_dirichlet :: Ptr () -> CSize -> Ptr Double -> Ptr Double -> IO ()
+
+
+
+
+-- | @lognormalPdf x zeta sigma@ evaluates the probability density
+--   @p(x)@ at @x@ for a log-normal distribution with parameters @zeta@
+--   and @sigma@, given.  The density is given by
+--   @p(x) dx = p(x) {1 \over x \sqrt{2 \pi \sigma^2} } \exp(-(\ln(x) - \zeta)^2/2 \sigma^2) dx@
+lognormalPdf :: Double -> Double -> Double -> Double
+lognormalPdf = liftDouble3 gsl_ran_lognormal_pdf
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_lognormal_pdf :: CDouble -> CDouble -> CDouble -> CDouble
+
+-- | @getLognormal zeta sigma@ gets a random lognormal with parameters @zeta@ and @sigma@.
+getLognormal :: RNG -> Double -> Double -> IO Double
+getLognormal = liftRan2 gsl_ran_lognormal
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_ran_lognormal :: Ptr () -> CDouble -> CDouble -> IO CDouble
+
+lognormalP :: Double -> Double -> Double -> Double
+lognormalP = liftDouble3 gsl_cdf_lognormal_P
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_lognormal_P :: CDouble -> CDouble -> CDouble -> CDouble
+
+lognormalQ :: Double -> Double -> Double -> Double
+lognormalQ = liftDouble3 gsl_cdf_lognormal_Q
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_lognormal_Q :: CDouble -> CDouble -> CDouble -> CDouble
+
+lognormalPInv :: Double -> Double -> Double -> Double
+lognormalPInv = liftDouble3 gsl_cdf_lognormal_Pinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_lognormal_Pinv :: CDouble -> CDouble -> CDouble -> CDouble
+
+lognormalQInv :: Double -> Double -> Double -> Double
+lognormalQInv = liftDouble3 gsl_cdf_lognormal_Qinv
+
+foreign import ccall unsafe "gsl/gsl_randist.h"
+    gsl_cdf_lognormal_Qinv :: CDouble -> CDouble -> CDouble -> CDouble
+
 
 
 
