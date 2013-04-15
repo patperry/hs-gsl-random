@@ -32,4 +32,4 @@ library
     ghc-options:        -Wall
     extensions:         ForeignFunctionInterface
     build-depends:      base   >= 4       && < 5
-                      , vector >= 0.7.0.1 && < 0.10
+                      , vector >= 0.7.0.1 && < 0.11
