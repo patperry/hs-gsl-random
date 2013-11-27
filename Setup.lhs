@@ -24,10 +24,7 @@
 >     } 
 > }
 > 
-> gslconfigProgram = (simpleProgram "gsl-config") {
->     programFindLocation = \verbosity ->
->       findProgramLocation verbosity "gsl-config"
->   }
+> gslconfigProgram = (simpleProgram "gsl-config")
 > 
 > gslBuildInfo :: LocalBuildInfo -> IO BuildInfo
 > gslBuildInfo lbi = do
