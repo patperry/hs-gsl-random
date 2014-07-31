@@ -1,3 +1,6 @@
+Changes in 0.4.6
+* Levi Schuck added fix for Cabal 1.18
+
 Changes in 0.4.5
 * Clark Gaebel added the lognormal distribution.
 
