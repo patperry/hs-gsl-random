@@ -1,3 +1,6 @@
+Changes in 0.5.0
+* Added Eq, Show, Data, Typeable instances
+
 Changes in 0.4.6
 * Levi Schuck added fix for Cabal 1.18
 

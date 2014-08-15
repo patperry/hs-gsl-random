@@ -1,4 +1,4 @@
-{-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE DeriveDataTypeable, ForeignFunctionInterface #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module     : GSL.Random.Gen.Internal
@@ -42,6 +42,7 @@ module GSL.Random.Gen.Internal (
     ) where
 
 import Control.Monad( liftM )
+import Data.Data( Data, Typeable )
 import Data.Maybe( fromJust )
 import Foreign( ForeignPtr, FunPtr, Ptr, Word8, Word64, advancePtr, castPtr,
     peek, peekArray, pokeArray, newForeignPtr, nullPtr, withForeignPtr )
@@ -50,8 +51,8 @@ import Foreign.C.Types( CDouble(..), CInt(..), CSize(..), CULong(..) )
 import System.IO.Unsafe( unsafePerformIO )
 
 
-newtype RNG     = MkRNG (ForeignPtr ())
-newtype RNGType = MkRNGType (Ptr ())
+newtype RNG     = MkRNG (ForeignPtr ()) deriving (Eq, Show, Data, Typeable)
+newtype RNGType = MkRNGType (Ptr ())    deriving (Eq, Show, Data, Typeable)
 
 
 --------------------------- Initialization ----------------------------------

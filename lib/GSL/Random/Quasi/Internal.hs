@@ -1,4 +1,4 @@
-{-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE DeriveDataTypeable, ForeignFunctionInterface #-}
 ----------------------------------------------------------------------------
 -- |
 -- Module     : GSL.Random.Quasi.Internal
@@ -42,14 +42,15 @@ module GSL.Random.Quasi.Internal (
     ) where
 
 import Control.Monad( liftM )
+import Data.Data( Data, Typeable )
 import Foreign( ForeignPtr, FunPtr, Ptr, Word8, Word64, allocaArray,
     newForeignPtr, peekArray, pokeArray, withForeignPtr )
 import Foreign.C.String( CString, peekCAString )
 import Foreign.C.Types( CInt(..), CSize(..), CUInt(..) )
 import System.IO.Unsafe( unsafePerformIO )
 
-newtype QRNG     = MkQRNG (ForeignPtr QRNG)
-newtype QRNGType = MkQRNGType (Ptr QRNGType)
+newtype QRNG     = MkQRNG (ForeignPtr QRNG)  deriving (Eq, Show, Data, Typeable)
+newtype QRNGType = MkQRNGType (Ptr QRNGType) deriving (Eq, Show, Data, Typeable)
 
 
 --------------------------- Initialization ---------------------------------

@@ -1,5 +1,5 @@
 name:            gsl-random
-version:         0.4.6
+version:         0.5.0
 homepage:        http://github.com/patperry/hs-gsl-random
 synopsis:        Bindings the the GSL random number generation facilities.
 description:
@@ -30,6 +30,7 @@ library
     c-sources:          cbits/qrng_extras.c
 
     ghc-options:        -Wall
-    extensions:         ForeignFunctionInterface
+    extensions:         DeriveDataTypeable,
+                        ForeignFunctionInterface
     build-depends:      base   >= 4       && < 5
                       , vector >= 0.7.0.1 && < 0.11
