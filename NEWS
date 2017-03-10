@@ -1,3 +1,6 @@
+Changes in 0.5.1
+* @avctrh added Stack support (LTS 8.4)
+
 Changes in 0.5.0
 * Added Eq, Show, Data, Typeable instances
 

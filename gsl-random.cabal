@@ -1,5 +1,5 @@
 name:            gsl-random
-version:         0.5.0
+version:         0.5.1
 homepage:        http://github.com/patperry/hs-gsl-random
 synopsis:        Bindings the the GSL random number generation facilities.
 description:
