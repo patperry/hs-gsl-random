@@ -1,3 +1,6 @@
+Changes in 0.5.2
+* Replace deprecated 'rawSystemProgramStdout' call with 'getProgramOutput'
+
 Changes in 0.5.1
 * @avctrh added Stack support (LTS 8.4)
 

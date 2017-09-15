@@ -30,7 +30,7 @@
 > gslBuildInfo lbi = do
 >   (gslconfigProg, _) <- requireProgram verbosity
 >                          gslconfigProgram (withPrograms lbi)
->   let gslconfig = rawSystemProgramStdout verbosity gslconfigProg
+>   let gslconfig = getProgramOutput verbosity gslconfigProg
 > 
 >   cflags <- words `fmap` gslconfig ["--cflags"]
 >   libs <- words `fmap` gslconfig ["--libs"]
