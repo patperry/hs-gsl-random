@@ -14,7 +14,7 @@ copyright:       Patrick Perry,
 author:          Patrick Perry,
                  Tracy Wadleigh
 maintainer:      Patrick Perry <patperry@gmail.com>
-cabal-version:   >= 1.23.0
+cabal-version:   >= 1.23
 build-type:      Custom
 tested-with:     GHC == 8.2.1
 
@@ -25,7 +25,7 @@ source-repository head
     location:           git://github.com/patperry/hs-gsl-random.git
 
 custom-setup
-    setup-depends:      Cabal >= 1.23.0
+    setup-depends:      Cabal >= 1.23
 
 library
     hs-source-dirs:     lib
